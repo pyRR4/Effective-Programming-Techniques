@@ -1,0 +1,13 @@
+﻿  CNumber.cpp
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.h(14,9): error C3646: "sToStr": nieznany specyfikator przesłonięcia
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.h(14,15): error C2059: błąd składniowy: „(”
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.h(14,17): error C2238: nieoczekiwany(e) token(y) poprzedzający(e) ";"
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.cpp(26,17): error C2039: „sToStr”: nie jest składową elementu „CNumber”
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.h(5,7): message : zobacz deklarację „CNumber”
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.cpp(29,22): error C2065: "i_length": niezadeklarowany identyfikator
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.cpp(30,15): error C2065: "pi_number": niezadeklarowany identyfikator
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.cpp(70,8): warning C4552: „/”: Wynik wyrażenia nie jest używany
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.cpp(83,7): error C2039: „sToStr”: nie jest składową elementu „CNumber”
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.h(5,7): message : zobacz deklarację „CNumber”
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.cpp(84,8): error C2039: „sToStr”: nie jest składową elementu „CNumber”
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 2\CNumber\CNumber.h(5,7): message : zobacz deklarację „CNumber”
