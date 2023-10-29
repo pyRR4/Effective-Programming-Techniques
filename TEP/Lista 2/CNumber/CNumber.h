@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 using namespace std;
 
@@ -11,10 +12,9 @@ public:
 	CNumber();
 	CNumber(int iNumber, int iLength);
 	~CNumber();
-	string sToStr();
 	void operator= (const int iValue);
 	void operator= (const CNumber &pcOther);
-	void reallocate(int iLength);
+	string sToStr();
 };
 
 static int intLength(int iVal);

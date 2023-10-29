@@ -1,12 +1,16 @@
 #include "CNumber.h"
 #include <iostream>
+#include <sstream>
+#include <string>
+
+using namespace std;
 
 CNumber::CNumber()
 {
 	i_length = DEFAULT_LENGTH;
 	pi_number = new int[i_length];
 	operator=(DEFAULT_NUM);
-	cout << "bezparam: " << endl;
+	cout << "bezparam: " << sToStr() << endl;
 }
 
 CNumber::CNumber(int iNumber, int iLength) 
@@ -14,36 +18,29 @@ CNumber::CNumber(int iNumber, int iLength)
 	i_length = iLength;
 	pi_number = new int[i_length];
 	operator=(iNumber);
-	cout << "param: " << endl;
+	cout << "param: " << sToStr() << endl;
 }
 
-CNumber::~CNumber()
-{
+CNumber::~CNumber() {
+	cout << "usuwam: " << sToStr() << endl;
 	delete pi_number;
-	cout << "usuwam: " << endl;
 }
-
-string CNumber::sToStr()
-{
-	string retValue = "";
-	for (int i = 0; i < i_length; i++)
-		retValue += pi_number[i];
-	return retValue;
-}
-
-
-
 
 void CNumber::operator=(const int iValue)
 {
 	int x = iValue;
-	int int_length = intLength(x);
-	if (i_length < int_length)
-		reallocate(int_length);
-	for (int i = i_length; i >= 0; i--) {
-		pi_number[i] = x % 10;
-		x /= 10;
+	int val_length = intLength(x);
+	if (i_length < val_length) {
+		i_length = val_length;
+		
+		delete pi_number;
+		pi_number = new int[i_length];
 	}
+	for (int i = i_length - 1; i >= 0; i--) {
+		pi_number[i] = x % 10;
+		x = x / 10;
+	}
+	cout << "przypisano wartosc " << iValue << endl;
 }
 
 
@@ -54,34 +51,35 @@ void CNumber::operator=(const CNumber& pcOther)
 	i_length = pcOther.i_length;
 }
 
-void CNumber::reallocate(int iLength)
+string CNumber::sToStr()
 {
-	i_length = iLength;
-	delete pi_number;
-	pi_number = new int[i_length];
+	ostringstream oss;
+	for (int i = 0; i < i_length; i++)
+		oss << pi_number[i];
+	return oss.str();
 }
-
 
 int intLength(int iVal)
 {
-	int result = 0;
+	int iResult = 0;
 	while (iVal != 0) {
-		result++;
-		iVal / 10;
+		iResult++;
+		iVal = iVal / 10;
 	}
-	return result;
+	return iResult;
 }
 
 
 int main() {
-	CNumber* num = new CNumber();
-	CNumber* num1 = new CNumber(5, 1);
 
-	*num = 3215;
-	*num1 = 2314439;
+	CNumber num2, num3;
+	num2 = 368;
+	num3 = 1567;
+	num2 = num3;
 
-	num->sToStr();
-	num1->sToStr();
+
+	cout << num2.sToStr() << endl;
+	cout << num3.sToStr() << endl;
 
 	return 0;
 }
