@@ -26,19 +26,35 @@ CNumber::~CNumber() {
 	delete pi_number;
 }
 
+void CNumber::reallocate(int iNewLength)
+{
+	
+	int* newPiNum = new int[iNewLength];
+	for (int i = 0; i < iNewLength; i++) {
+		newPiNum[i] = pi_number[i];
+	}
+	i_length = iNewLength;
+	delete pi_number;
+	pi_number = newPiNum;
+}
+
 void CNumber::operator=(const int iValue)
 {
-	int x = iValue;
-	int val_length = intLength(x);
-	if (i_length < val_length) {
-		i_length = val_length;
+	int iVal = iValue;
+	int valLength = intLength(iVal);
+	if (i_length < valLength) {
+		i_length = valLength;
 		
 		delete pi_number;
 		pi_number = new int[i_length];
 	}
 	for (int i = i_length - 1; i >= 0; i--) {
-		pi_number[i] = x % 10;
-		x = x / 10;
+		if (iVal % 10 >= NUM_SYSTEM)
+			cout << "wartosc niezgodna z przyjetym systemem liczbowym! nie przypisano wartosci na miejscu " << i + 1 << endl;
+		else {
+			pi_number[i] = iVal % 10;
+			iVal = iVal / 10;
+		}
 	}
 	cout << "przypisano wartosc " << iValue << endl;
 }
@@ -47,8 +63,41 @@ void CNumber::operator=(const int iValue)
 
 void CNumber::operator=(const CNumber& pcOther)
 {
-	pi_number = pcOther.pi_number;
+	delete pi_number;
 	i_length = pcOther.i_length;
+	pi_number = new int[i_length];
+	for (int i = 0; i < i_length; i++)
+		pi_number[i] = pcOther.pi_number[i];
+}
+
+void CNumber::operator+(const int iValue)
+{
+	int iVal = iValue;
+	int valLength = intLength(iValue);
+	if (valLength >= i_length)
+		reallocate(valLength + 1);
+	for (int i = 0; i < valLength; i++) {
+		pi_number[i] = pi_number[i] + (iVal % 10);
+		iVal /= 10;
+		if (pi_number[i] >= NUM_SYSTEM) {
+			pi_number[i] = pi_number[i] % 10;
+			pi_number[i + 1]++;
+		}
+	}
+}
+
+void CNumber::operator+(const CNumber& pcOther)
+{
+	if (pcOther.i_length >= i_length) {
+		reallocate(pcOther.i_length + 1);
+	}
+	for (int i = 0; i < pcOther.i_length; i++) {
+		pi_number[i] = pi_number[i] + pcOther.pi_number[i];
+		if (pi_number[i] >= NUM_SYSTEM) {
+			pi_number[i] = pi_number[i] % 10;
+			pi_number[i + 1]++;
+		}
+	}
 }
 
 string CNumber::sToStr()
@@ -76,10 +125,15 @@ int main() {
 	num2 = 368;
 	num3 = 1567;
 	num2 = num3;
+	
 
 
 	cout << num2.sToStr() << endl;
 	cout << num3.sToStr() << endl;
+
+	num2 + num3;
+
+	cout << num2.sToStr() << endl;
 
 	return 0;
 }
