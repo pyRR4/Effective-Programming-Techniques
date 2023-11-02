@@ -31,7 +31,10 @@ void CNumber::reallocate(int iNewLength)
 	
 	int* newPiNum = new int[iNewLength];
 	for (int i = 0; i < iNewLength; i++) {
-		newPiNum[i] = pi_number[i];
+		if(i < i_length)
+			newPiNum[iNewLength - 1 - i] = pi_number[i_length - 1 - i];
+		else
+			newPiNum[iNewLength - 1 - i] = 0;
 	}
 	i_length = iNewLength;
 	delete pi_number;
@@ -76,12 +79,12 @@ void CNumber::operator+(const int iValue)
 	int valLength = intLength(iValue);
 	if (valLength >= i_length)
 		reallocate(valLength + 1);
-	for (int i = 0; i < valLength; i++) {
-		pi_number[i] = pi_number[i] + (iVal % 10);
+	for (int i = 1; i <= valLength; i++) {
+		pi_number[i_length - i] = pi_number[i_length - i] + (iVal % 10);
 		iVal /= 10;
-		if (pi_number[i] >= NUM_SYSTEM) {
-			pi_number[i] = pi_number[i] % 10;
-			pi_number[i + 1]++;
+		if (pi_number[i_length - i] >= NUM_SYSTEM) {
+			pi_number[i_length - i] = pi_number[i_length - i] % 10;
+			pi_number[i_length - i - 1]++;
 		}
 	}
 }
@@ -91,11 +94,11 @@ void CNumber::operator+(const CNumber& pcOther)
 	if (pcOther.i_length >= i_length) {
 		reallocate(pcOther.i_length + 1);
 	}
-	for (int i = 0; i < pcOther.i_length; i++) {
-		pi_number[i] = pi_number[i] + pcOther.pi_number[i];
-		if (pi_number[i] >= NUM_SYSTEM) {
-			pi_number[i] = pi_number[i] % 10;
-			pi_number[i + 1]++;
+	for (int i = 1; i <= pcOther.i_length; i++) {
+		pi_number[i_length - i] = pi_number[i_length - i] + pcOther.pi_number[pcOther.i_length - i];
+		if (pi_number[i_length - i] >= NUM_SYSTEM) {
+			pi_number[i_length - i] = pi_number[i_length - i] % 10;
+			pi_number[i_length - 1 - i]++;
 		}
 	}
 }
@@ -132,8 +135,11 @@ int main() {
 	cout << num3.sToStr() << endl;
 
 	num2 + num3;
+	num3 = 321456;
+	num3 + 931458;
 
 	cout << num2.sToStr() << endl;
+	cout << num3.sToStr() << endl;
 
 	return 0;
 }
