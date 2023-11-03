@@ -181,12 +181,53 @@ CNumber CNumber::operator-(const CNumber& pcOther)
 
 CNumber CNumber::operator*(const int iValue)
 {
-	return CNumber();
+	int iVal = iValue;
+	int valLength = intLength(iValue);
+	CNumber cRetValue; 
+	cRetValue = 0;
+	if (valLength >= i_length) {
+		cRetValue.reallocate(valLength * 2);
+	}
+	else {
+		cRetValue.reallocate(i_length * 2);
+		for (int i = 0; i < valLength; i++) {
+			for (int j = 1; j <= i_length; j++) {
+				cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] + pi_number[i_length - j] * (iVal % 10);
+				if (cRetValue.pi_number[cRetValue.i_length - i - j] >= NUM_SYSTEM) {
+					int iMove = cRetValue.pi_number[cRetValue.i_length - i - j] / 10;
+					cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] % 10;
+					cRetValue.pi_number[cRetValue.i_length - i - j - 1] += iMove;
+				}
+			}
+			iVal /= 10;
+		}
+	}
+	
+	return cRetValue;
 }
 
 CNumber CNumber::operator*(const CNumber& pcOther)
 {
-	return CNumber();
+	CNumber cRetValue;
+	cRetValue = 0;
+	if (pcOther.i_length >= i_length) {
+		cRetValue.reallocate(pcOther.i_length * 2);
+	}
+	else {
+		cRetValue.reallocate(i_length * 2);
+		for (int i = 0; i < pcOther.i_length; i++) {
+			for (int j = 1; j <= i_length; j++) {
+				cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] + pi_number[i_length - j] * pcOther.pi_number[pcOther.i_length - i - 1];
+				if (cRetValue.pi_number[cRetValue.i_length - i - j] >= NUM_SYSTEM) {
+					int iMove = cRetValue.pi_number[cRetValue.i_length - i - j] / 10;
+					cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] % 10;
+					cRetValue.pi_number[cRetValue.i_length - i - j - 1] += iMove;
+				}
+			}
+		}
+	}
+
+	return cRetValue;
 }
 
 bool CNumber::operator>(const int iValue)
@@ -282,7 +323,7 @@ int main() {
 	CNumber num2, num3;
 	num2 = 368;
 	num3 = 234502;
-	num2 = num2 - num3;
+	num2 = num3 * num2;
 	cout << "num2: " << num2.sToStr() << endl;
 
 	return 0;
