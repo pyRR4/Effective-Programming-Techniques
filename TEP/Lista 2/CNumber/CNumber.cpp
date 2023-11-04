@@ -185,8 +185,8 @@ CNumber CNumber::operator*(const int iValue)
 	int valLength = intLength(iValue);
 	CNumber cRetValue; 
 	cRetValue = 0;
+	cRetValue.reallocate(valLength + i_length);
 	if (valLength >= i_length) {
-		cRetValue.reallocate(valLength * 2);
 		for (int i = 0; i < i_length; i++) {
 			for (int j = 1; j <= valLength; j++) {
 				cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] + pi_number[i_length - i - 1] * (iVal % 10);
@@ -201,7 +201,6 @@ CNumber CNumber::operator*(const int iValue)
 		}
 	}
 	else {
-		cRetValue.reallocate(i_length * 2);
 		for (int i = 0; i < valLength; i++) {
 			for (int j = 1; j <= i_length; j++) {
 				cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] + pi_number[i_length - j] * (iVal % 10);
@@ -222,8 +221,8 @@ CNumber CNumber::operator*(const CNumber& pcOther)
 {
 	CNumber cRetValue;
 	cRetValue = 0;
+	cRetValue.reallocate(pcOther.i_length + i_length);
 	if (pcOther.i_length >= i_length) {
-		cRetValue.reallocate(pcOther.i_length * 2);
 		for (int i = 0; i < i_length; i++) {
 			for (int j = 1; j <= pcOther.i_length; j++) {
 				cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] + pi_number[i_length - i - 1] * pcOther.pi_number[pcOther.i_length - j];
@@ -236,7 +235,6 @@ CNumber CNumber::operator*(const CNumber& pcOther)
 		}
 	}
 	else {
-		cRetValue.reallocate(i_length * 2);
 		for (int i = 0; i < pcOther.i_length; i++) {
 			for (int j = 1; j <= i_length; j++) {
 				cRetValue.pi_number[cRetValue.i_length - i - j] = cRetValue.pi_number[cRetValue.i_length - i - j] + pi_number[i_length - j] * pcOther.pi_number[pcOther.i_length - i - 1];
@@ -254,12 +252,56 @@ CNumber CNumber::operator*(const CNumber& pcOther)
 
 CNumber CNumber::operator/(const int iValue)
 {
-	return CNumber();
+	CNumber cRetValue;
+	cRetValue = 0;
+	int iResultIndex = intLength(iValue);
+	if (*this > iValue) {
+		CNumber cTmp;
+		cTmp.reallocate(iResultIndex);
+		int iThisStartIndex = findStartIndex();
+		cRetValue.reallocate(i_length - iThisStartIndex);
+		for (int i = 1; i <= iResultIndex; i++)
+			cTmp.pi_number[cTmp.i_length - i] = pi_number[iThisStartIndex + iResultIndex - i];
+		while (iResultIndex <= cRetValue.i_length) { //dlugosc dzielnej - dlugosc dzielnika + 1 razy
+			int iTimes = 0;
+			while (!(cTmp < iValue)) { // max 9 razy
+				cTmp = cTmp - iValue;
+				iTimes++;
+			}
+			cRetValue.pi_number[iResultIndex - 1] = iTimes;
+			iResultIndex++;
+			cTmp = cTmp * 10;
+			cTmp.pi_number[cTmp.i_length - 1] = pi_number[iThisStartIndex + iResultIndex - 1];
+		}
+	}
+	return cRetValue;
 }
 
 CNumber CNumber::operator/(const CNumber& pcOther)
 {
-	return CNumber();
+	CNumber cRetValue;
+	cRetValue = 0;
+	int iResultIndex = pcOther.i_length;
+	if (*this > pcOther) {
+		CNumber cTmp;
+		cTmp.reallocate(iResultIndex);
+		int iThisStartIndex = findStartIndex();
+		cRetValue.reallocate(i_length - iThisStartIndex);
+		for (int i = 1; i <= iResultIndex; i++)
+			cTmp.pi_number[cTmp.i_length - i] = pi_number[iThisStartIndex + iResultIndex - i];
+		while (iResultIndex <= cRetValue.i_length) { //dlugosc dzielnej - dlugosc dzielnika + 1 razy
+			int iTimes = 0;
+			while (!(cTmp < pcOther)) { // max 9 razy
+				cTmp = cTmp - pcOther;
+				iTimes++;
+			}
+			cRetValue.pi_number[iResultIndex - 1] = iTimes;
+			iResultIndex++;
+			cTmp = cTmp * 10;
+			cTmp.pi_number[cTmp.i_length - 1] = pi_number[iThisStartIndex + iResultIndex - 1];
+		}
+	}
+	return cRetValue;
 }
 
 bool CNumber::operator>(const int iValue)
@@ -353,9 +395,9 @@ int CNumber::findStartIndex()
 int main() {
 
 	CNumber num2, num3;
-	num2 = 368;
+	num2 = 1;
 	num3 = 234502;
-	num2 = num2 * 400;
+	num2 = num3 / num2;
 	cout << "num2: " << num2.sToStr() << endl;
 
 	return 0;
