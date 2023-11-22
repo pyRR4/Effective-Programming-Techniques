@@ -1,10 +1,11 @@
 #include <iostream>
-#include "CTree.cpp"
+#include <string>
+#include "ConsoleGUI.h"
 
 using namespace std;
 
 int main() {
-
-
-	return 0;
+	ConsoleGUI* pcConsole = new ConsoleGUI();
+	pcConsole->vAsker();
+	delete pcConsole;
 }
