@@ -4,6 +4,8 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "CString.h"
+#include "CBool.h"
 
 using namespace std;
 
@@ -15,6 +17,11 @@ static const char SUBSTRACTION = '-';
 static const string SIN = "sin";
 static const string COS = "cos";
 static const string SUPERSUM = "supersum";
+static const string INT = "int";
+static const string BOOL = "bool";
+static const string DOUBLE = "double";
+static const string STRING = "string";
+static const string UNKNOWN = "unknown";
 
 vector<string> vStrToVec(string sInput)
 {
@@ -48,6 +55,27 @@ bool isVariable(string sValue)
 	return false;
 }
 
+bool isStringVariable(string sValue)
+{
+	if (sValue[0] == '"' && sValue[sValue.length() - 1] == '"')
+		return false;
+	return true;
+}
+
+bool isBoolVariable(string sValue)
+{
+	if (sValue == "1" || sValue == "0")
+		return false;
+	return true;
+}
+
+bool bValue(string sValue) {
+	if (stoi(sValue) == 1)
+		return true;
+	else
+		return false;
+}
+
 template <typename T> class CNode
 {
 private:
@@ -73,10 +101,18 @@ public:
 			i_children = 2;
 		}
 		else if (c_value.compare(SIN) == 0 || c_value.compare(COS) == 0) {
+			if (sGetKnownType() == BOOL)
+				throw new invalid_argument("Wezel nie moze przyjmowac 1 lub wiecej niz 2 argumentow!");
+			if (sGetKnownType() == STRING) {
+				pc_children = new CNode[0];
+				pc_children = 0;
+			}
 			pc_children = new CNode[1];
 			i_children = 1;
 		}
 		else if (c_value.compare(SUPERSUM) == 0) {
+			if(sGetKnownType() == BOOL)
+				throw new invalid_argument("Wezel nie moze przyjmowac 1 lub wiecej niz 2 argumentow!");
 			pc_children = new CNode[4];
 			i_children = 4;
 			c_value = ADDITION;
@@ -118,10 +154,11 @@ public:
 			break;
 		}
 	}
-	~CNode()
-	{
-		delete[] pc_children;
+	~CNode() {
+		if(pc_children != nullptr)
+			delete[] pc_children;
 	}
+	CString sGetKnownType();
 	string sPrefix(string toAppend);
 	CNode* pcGetChildren();
 	CNode* pcGetParent();
@@ -129,9 +166,42 @@ public:
 	int iGetChildren();
 	int iGetCurrChildren();
 	void vSetCurrChildren(int iNewValue);
-	double iNodeValue(map<string, double> mVars);
+	T tNodeValue(map<string, string> mVars);
 	string sGetValue();
 };
+
+
+
+template <>
+CString CNode<int>::sGetKnownType()
+{
+	CString s_type;
+	s_type = INT;
+	return s_type;
+}
+
+template <>
+CString CNode<double>::sGetKnownType()
+{
+	CString s_type;
+	s_type = DOUBLE;
+	return s_type;
+}
+
+template <>
+CString CNode<string>::sGetKnownType()
+{
+	CString s_type;
+	s_type = STRING;
+	return s_type;
+}
+template <>
+CString CNode<bool>::sGetKnownType()
+{
+	CString s_type;
+	s_type = BOOL;
+	return s_type;
+}
 
 template <typename T>
 string CNode<T>::sPrefix(string toAppend)
@@ -153,39 +223,134 @@ string CNode<T>::sPrefix(string toAppend)
 	return toAppend;
 }
 
-template <typename T>
-double CNode<T>::iNodeValue(map<string, double> mVars) //tuuuuuuu
+template <>
+double CNode<double>::tNodeValue(map<string, string> mVars) //tuuuuuuu
 {
 	if (i_children == 0)
 		if (!isVariable(c_value))
 			return stod(c_value);
 		else {
-			return mVars[this->c_value];
+			return stod(mVars[this->c_value]);
 		}
 	else if (i_children == 1)
 		if (c_value.compare(SIN) == 0)
-			return sin(pc_children[0].iNodeValue(mVars));
+			return sin(pc_children[0].tNodeValue(mVars));
 		else
-			return cos(pc_children[0].iNodeValue(mVars));
+			return cos(pc_children[0].tNodeValue(mVars));
 	else if (i_children == 2)
 		switch (c_value[0]) {
 		case MULTIPLICATION:
-			return (pc_children[0].iNodeValue(mVars) * pc_children[1].iNodeValue(mVars));
+			return (pc_children[0].tNodeValue(mVars) * pc_children[1].tNodeValue(mVars));
 			break;
 		case DIVISION:
-			return (pc_children[0].iNodeValue(mVars) / pc_children[1].iNodeValue(mVars));
+			return (pc_children[0].tNodeValue(mVars) / pc_children[1].tNodeValue(mVars));
 			break;
 		case SUBSTRACTION:
-			return (pc_children[0].iNodeValue(mVars) - pc_children[1].iNodeValue(mVars));
+			return (pc_children[0].tNodeValue(mVars) - pc_children[1].tNodeValue(mVars));
 			break;
 		case ADDITION:
-			return (pc_children[0].iNodeValue(mVars) + pc_children[1].iNodeValue(mVars));
+			return (pc_children[0].tNodeValue(mVars) + pc_children[1].tNodeValue(mVars));
 			break;
 		}
-	else {
-		return (pc_children[0].iNodeValue(mVars) + pc_children[1].iNodeValue(mVars) + pc_children[2].iNodeValue(mVars) + pc_children[3].iNodeValue(mVars));
+	else if (i_children == 4) {
+		return (pc_children[0].tNodeValue(mVars) + pc_children[1].tNodeValue(mVars) + pc_children[2].tNodeValue(mVars) + pc_children[3].tNodeValue(mVars));
 	}
 }
+template <>
+int CNode<int>::tNodeValue(map<string, string> mVars) //tuuuuuuu
+{
+	if (i_children == 0)
+		if (!isVariable(c_value))
+			return stoi(c_value);
+		else {
+			return stoi(mVars[this->c_value]);
+		}
+	else if (i_children == 1)
+		if (c_value.compare(SIN) == 0)
+			return (int)sin(pc_children[0].tNodeValue(mVars));
+		else
+			return (int)cos(pc_children[0].tNodeValue(mVars));
+	else if (i_children == 2)
+		switch (c_value[0]) {
+		case MULTIPLICATION:
+			return (pc_children[0].tNodeValue(mVars) * pc_children[1].tNodeValue(mVars));
+			break;
+		case DIVISION:
+			return (pc_children[0].tNodeValue(mVars) / pc_children[1].tNodeValue(mVars));
+			break;
+		case SUBSTRACTION:
+			return (pc_children[0].tNodeValue(mVars) - pc_children[1].tNodeValue(mVars));
+			break;
+		case ADDITION:
+			return (pc_children[0].tNodeValue(mVars) + pc_children[1].tNodeValue(mVars));
+			break;
+		}
+	else if (i_children == 4) {
+		return (pc_children[0].tNodeValue(mVars) + pc_children[1].tNodeValue(mVars) + pc_children[2].tNodeValue(mVars) + pc_children[3].tNodeValue(mVars));
+	}
+}
+template <>
+string CNode<string>::tNodeValue(map<string, string> mVars) {
+	if (i_children == 0)
+		if (!isStringVariable(c_value))
+			return c_value.substr(1, c_value.size() - 2);
+		else {
+			return mVars[this->c_value];
+		}
+	else if (i_children == 2) {
+		CString cChild1 = pc_children[0].tNodeValue(mVars);
+		CString cChild2 = pc_children[1].tNodeValue(mVars);
+		switch (c_value[0]) {
+		case MULTIPLICATION:
+			return (cChild1 * cChild2).sToString();
+			break;
+		case DIVISION:
+			return (cChild1 / cChild2).sToString();
+			break;
+		case SUBSTRACTION:
+			return (cChild1 - cChild2).sToString();
+			break;
+		case ADDITION:
+			return (cChild1 + cChild2).sToString();
+			break;
+		}
+	}
+	else if (i_children == 4) {
+		CString cChild1 = pc_children[0].tNodeValue(mVars);
+		CString cChild2 = pc_children[1].tNodeValue(mVars);
+		CString cChild3 = pc_children[2].tNodeValue(mVars);
+		CString cChild4 = pc_children[3].tNodeValue(mVars);
+		return (cChild1 + cChild2 + cChild3 + cChild4).sToString();
+	}
+}
+template <>
+bool CNode<bool>::tNodeValue(map<string, string> mVars) {
+	if (i_children == 0)
+		if (!isBoolVariable(c_value))
+			return bValue(c_value);
+		else {
+			return bValue(mVars[this->c_value]);
+		}
+	else if (i_children == 2) {
+		CBool cChild1 = pc_children[0].tNodeValue(mVars);
+		CBool cChild2 = pc_children[1].tNodeValue(mVars);
+		switch (c_value[0]) {
+		case MULTIPLICATION:
+			return (cChild1 * cChild2).bGetValue();
+			break;
+		case DIVISION:
+			return (cChild1 / cChild2).bGetValue();
+			break;
+		case SUBSTRACTION:
+			return (cChild1 - cChild2).bGetValue();
+			break;
+		case ADDITION:
+			return (cChild1 + cChild2).bGetValue();
+			break;
+		}
+	}
+}
+
 
 template <typename T>
 string CNode<T>::sGetValue()

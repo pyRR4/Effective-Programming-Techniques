@@ -12,7 +12,7 @@ template <typename T> class CTree
 {
 private:
 	CNode<T>* pc_root;
-	map<string, double> m_variables;
+	map<string, string> m_variables;
 	bool b_fixed;
 public:
 	CTree()
@@ -28,9 +28,8 @@ public:
 	CTree(vector<string> vecFormula)
 	{
 		b_fixed = false;
-		pc_root = new CNode<T>(vecFormula[0], nullptr);
-		if (pc_root->iGetChildren() == 0 && isVariable(pc_root->sGetValue()))
-			m_variables[pc_root->sGetValue()] = NULL;
+		pc_root = new CNode<T>(vecFormula[0], nullptr); 
+		addVars(pc_root, pc_root);
 		CNode<T>* pcParent = pc_root;
 		CNode<T>* pcChild = pc_root;
 		for (int i = 1; i < vecFormula.size(); i++) {
@@ -40,8 +39,9 @@ public:
 			if (pcParent->iGetChildren() != pcParent->iGetCurrChildren()) {
 				pcChild = new CNode<T>(vecFormula[i], pcParent);
 				pcParent->pcGetChildren()[pcParent->iGetCurrChildren()] = *pcChild;
-				if (pcChild->iGetChildren() == 0 && isVariable(pcChild->sGetValue()))
-					m_variables[(pcParent->pcGetChildren()[pcParent->iGetCurrChildren()]).sGetValue()] = NULL;
+				addVars(pcChild, pcParent);
+				
+				
 				pcParent->vSetCurrChildren(pcParent->iGetCurrChildren() + 1);
 				pcParent = &(pcParent->pcGetChildren()[pcParent->iGetCurrChildren() - 1]);
 			}
@@ -77,8 +77,8 @@ public:
 	{
 		b_fixed = pcOther.b_fixed;
 		pc_root = new CNode<T>(*pcOther.pc_root);
-		map<string, double> mTmpMap = pcOther.m_variables;
-		map<string, double>::iterator it;
+		map<string, string> mTmpMap = pcOther.m_variables;
+		map<string, string>::iterator it;
 		for (it = mTmpMap.begin(); it != mTmpMap.end(); it++)
 			m_variables[it->first] = it->second;
 	}
@@ -86,30 +86,73 @@ public:
 	{
 		delete pc_root;
 	}
-	double dTreeValue();
+	void addVars(CNode<T>* pcChild, CNode<T>* pcParent);
+	CString sGetKnownType();
+	T tTreeValue();
 	string sVarsToStr();
 	string sPrefix();
 	bool bGetFixed();
 	bool bSetVars(vector<string> vecValues);
-	map<string, double> mGetVars();
+	map<string, string> mGetVars();
 	void vJoin(CTree* pcNewTree);
 	void operator=(const CTree& pcNewTree);
 	CTree operator+(const CTree& pcNewTree);
 };
 
 
+template<typename T>
+void CTree<T>::addVars(CNode<T>* pcChild, CNode<T>* pcParent)
+{
+	if (pcChild->iGetChildren() == 0 && isVariable(pcChild->sGetValue()))
+		m_variables[(pcParent->pcGetChildren()[pcParent->iGetCurrChildren()]).sGetValue()] = DEFAULT_VALUE;
+}
+template<>
+void CTree<string>::addVars(CNode<string>* pcChild, CNode<string>* pcParent)
+{
+	if (pcChild->iGetChildren() == 0 && isStringVariable(pcChild->sGetValue()))
+		m_variables[(pcParent->pcGetChildren()[pcParent->iGetCurrChildren()]).sGetValue()] = DEFAULT_VALUE;
+}
+template<>
+void CTree<bool>::addVars(CNode<bool>* pcChild, CNode<bool>* pcParent)
+{
+	if (pcChild->iGetChildren() == 0 && isBoolVariable(pcChild->sGetValue()))
+		m_variables[(pcParent->pcGetChildren()[pcParent->iGetCurrChildren()]).sGetValue()] = DEFAULT_VALUE;
+}
 
+template<typename T>
+CString CTree<T>::sGetKnownType()
+{
+	return pc_root->sGetKnownType();
+}
+
+template<>
+CString CTree<int>::sGetKnownType()
+{
+	return pc_root->sGetKnownType();
+}
+
+template<>
+CString CTree<double>::sGetKnownType()
+{
+	return pc_root->sGetKnownType();
+}
+
+template<>
+CString CTree<string>::sGetKnownType()
+{
+	return pc_root->sGetKnownType();
+}
 
 template <typename T>
-double CTree<T>::dTreeValue()
+T CTree<T>::tTreeValue()
 {
-	return pc_root->iNodeValue(m_variables);
+	return pc_root->tNodeValue(m_variables);
 }
 
 template <typename T>
 string CTree<T>::sVarsToStr()
 {
-	map<string, double>::iterator itr;
+	map<string, string>::iterator itr;
 	string sRetValue;
 	for (itr = m_variables.begin(); itr != m_variables.end(); itr++)
 		sRetValue += ((*itr).first + DEFAULT_VALUE);
@@ -132,22 +175,37 @@ template <typename T>
 bool CTree<T>::bSetVars(vector<string> vValues)
 {
 	if (vValues.size() != m_variables.size()) {
-		cout << "Podano niepoprawna ilosc zmiennych!" << endl;
 		return false;
 	}
 	if (m_variables.size() == 0)
 		return true;
-	map<string, double>::iterator itr;
+	map<string, string>::iterator itr;
 	int i = 0;
 	for (itr = m_variables.begin(); itr != m_variables.end(); itr++) {
-		(*itr).second = stod(vValues[i]);
+		if (sGetKnownType() == STRING)
+			if (!isStringVariable(vValues[i]))
+				(*itr).second = vValues[i].substr(1, vValues[i].size() - 2);
+			else
+				return false;
+		else if (sGetKnownType() == BOOL) {
+			if (!isBoolVariable(vValues[i]))
+				(*itr).second = vValues[i];
+			else
+				return false;
+		}
+		else
+			if (!isVariable(vValues[i]))
+				(*itr).second = vValues[i];
+			else
+				return false;
 		i++;
 	}
 	return true;
 }
 
+
 template <typename T>
-map<string, double> CTree<T>::mGetVars()
+map<string, string> CTree<T>::mGetVars()
 {
 	return m_variables;
 }
@@ -164,8 +222,8 @@ void CTree<T>::operator=(const CTree<T>& pcNewTree)
 	delete pc_root;
 	pc_root = new CNode<T>(*pcNewTree.pc_root);
 	m_variables.clear();
-	map<string, double> mTmpMap = pcNewTree.m_variables;
-	map<string, double>::iterator it;
+	map<string, string> mTmpMap = pcNewTree.m_variables;
+	map<string, string>::iterator it;
 	for (it = mTmpMap.begin(); it != mTmpMap.end(); it++)
 		m_variables[it->first] = it->second;
 }
@@ -185,7 +243,7 @@ CTree<T> CTree<T>::operator+(const CTree<T>& pcNewTree)
 	pcParent->pcGetChildren()[0] = *pcAddedElement->pc_root;
 	pcAddedElement->pc_root->vSetParent(pcParent);
 
-	map<string, double>::iterator it;
+	map<string, string>::iterator it;
 	for (it = pcAddedElement->m_variables.begin(); it != pcAddedElement->m_variables.end(); it++)
 		pcRetValue->m_variables[it->first] = it->second;
 

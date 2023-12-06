@@ -24,6 +24,7 @@ static const string COMP = "comp";
 static const string ENTER = "enter";
 static const string VARS = "vars";
 static const string QUIT = "quit";
+static const string RETURN = "return";
 
 template <typename T>
 void ConsoleGUI<T>::vAsker()
@@ -32,15 +33,14 @@ void ConsoleGUI<T>::vAsker()
 		cout << endl << "===============================" << endl;
 		cout << "Wpisz jedna z ponizszych komend:" << endl;
 		cout << "1. Wprowadz nowa formule: enter <formula>" << endl;
-		//cout << "2. Wprowadz SuperSume: supersum <formula>" << endl;
 		cout << "2. Wyswietl zmienne w formule: vars" << endl;
 		cout << "3. Oblicz formule dla podanych zmiennych: comp <var1> <var2> ... <varN> [ILOSC WARTOSCI MUSI BYC TAKA SAMA JAK ZMIENNYCH WYSWIETLONYCH PRZEZ VARS!!!]" << endl;
 		cout << "4. Wyswietl formule w postaci prefiksowej: print" << endl;
 		cout << "5. Dolacz nowa formule do aktualnej: join <formula>" << endl;
-		cout << "6. Wyjdz: quit" << endl << endl;
+		cout << "6. Wroc do wyboru typu drzewa: return" << endl << endl;
 		string sInput;
 		getline(cin, sInput);
-		if (sInput == QUIT) {
+		if (sInput == RETURN) {
 			delete pc_tree;
 			return;
 		}
@@ -62,14 +62,16 @@ void ConsoleGUI<T>::vAsker()
 		else if (sKey.compare(COMP) == 0) {
 			if (pc_tree != nullptr) {
 				if (pc_tree->bSetVars(vecInput))
-					cout << "Wartosc formuly wynosi: " << pc_tree->dTreeValue() << endl;
+					cout << "Wartosc formuly wynosi: " << pc_tree->tTreeValue() << endl;
+				else
+					cout << "Niepoprawne polecenie, sprobuj ponownie!" << endl;
 			}
 			else
 				cout << "Nie podano drzewa!" << endl;
 		}
 		else if (sKey.compare(JOIN) == 0) {
 			if (pc_tree != nullptr) {
-				pc_tree->vJoin(new CTree<double>(vecInput));
+				pc_tree->vJoin(new CTree<T>(vecInput));
 				if (pc_tree->bGetFixed())
 					cout << "Drzewo zostalo naprawione przez program i moze nie wskazywac zadanych wartosci";
 			}
@@ -78,19 +80,10 @@ void ConsoleGUI<T>::vAsker()
 		}
 		else if (sKey.compare(ENTER) == 0) {
 			delete pc_tree;
-			pc_tree = new CTree<double>(vecInput);
+			pc_tree = new CTree<T>(vecInput);
 			if (pc_tree->bGetFixed())
 				cout << "Drzewo zostalo naprawione przez program i moze nie wskazywac zadanych wartosci";
 		}
-		/*else if (sKey.compare(SUPERSUM) == 0) {
-			if (vecInput.size() != 4)
-				cout << "Niepoprawna liczba argumentow!" << endl;
-			else {
-				delete pc_tree;
-				string sModifiedInput = sSuperSumInput(vecInput);
-				pc_tree = new CTree(vStrToVec(sModifiedInput));
-			}
-		}*/
 		else {
 			cout << "Niepoprawne polecenie! Sprobuj ponownie." << endl;
 		}

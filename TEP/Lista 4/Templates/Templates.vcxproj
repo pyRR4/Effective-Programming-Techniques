@@ -127,11 +127,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CBool.h" />
     <ClInclude Include="CNode.h" />
     <ClInclude Include="ConsoleGUI.h" />
+    <ClInclude Include="CString.h" />
     <ClInclude Include="CTree.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CBool.cpp" />
+    <ClCompile Include="CString.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

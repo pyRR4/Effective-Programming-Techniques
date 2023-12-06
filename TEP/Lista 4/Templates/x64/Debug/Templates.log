@@ -1,1 +1,6 @@
-﻿  Templates.vcxproj -> C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 4\Templates\x64\Debug\Templates.exe
+﻿  Main.cpp
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 4\Templates\CNode.h(346): warning C4715: "CNode<bool>::tNodeValue”: niewszystkie ścieżki kodu zwracają wartość
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 4\Templates\CNode.h(252): warning C4715: "CNode<double>::tNodeValue”: niewszystkie ścieżki kodu zwracają wartość
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 4\Templates\CNode.h(285): warning C4715: "CNode<int>::tNodeValue”: niewszystkie ścieżki kodu zwracają wartość
+C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 4\Templates\CNode.h(319): warning C4715: "CNode<std::basic_string<char,std::char_traits<char>,std::allocator<char> > >::tNodeValue”: niewszystkie ścieżki kodu zwracają wartość
+  Templates.vcxproj -> C:\Users\igopo\OneDrive\Dokumenty\GitHub\Effective-Programming-Techniques\TEP\Lista 4\Templates\x64\Debug\Templates.exe
